@@ -1,13 +1,13 @@
 /**
- * Area Mapper jQuery JavaScript Plugin v0.0.1 version }}
+ * Area Mapper jQuery JavaScript Plugin v0.0.1
  * 
  *
- * 
+ * jQuery plugin providing a CRUD UI for defining areas over an image.
  *
  * Copyright 2013, Aaron Klump
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Fri May  9 12:44:50 PDT 2014
+ * Date: Fri May  9 17:12:03 PDT 2014
  */
 ;(function($, window, document, undefined) {
 "use strict";
@@ -31,6 +31,12 @@ AreaMapper.prototype = {
   // An area to hold all the created area objects.
   areas: [],
 
+  // Holds various timers as needed in the object scope.
+  timers: {},
+
+  // Will hold the instance of imgAreaSelect
+  selector: null,
+
   // An object to hold various states of the AreaMapper object.
   state: {"selected": null},
 
@@ -42,6 +48,47 @@ AreaMapper.prototype = {
 
     // An array of elements and flags to remove on next refresh.
     "removeFlag": []
+  },
+
+  /**
+   * onSelectEnd handler for imgareaselect.
+   *
+   * @param  {jQuery} img       The image that has been subselected.
+   * @param  {object} selection An object of selection coordinates.
+   *   - x1
+   *   - y1   coordinates of the top left corner of the selected area
+   *   - x2
+   *   - y2   coordinates of the bottom right corner of the selected area
+   *   - width  selection width
+   *   - height   selection height
+   *
+   * @return {[type]}           [description]
+   */
+  onSelectEnd: function (img, selection) {
+    var Map = this;
+    $('#convert').show().click(function () {
+      Map.createAreaFromSelection();
+    });
+  },
+
+  createAreaFromSelection: function (id) {
+    var Map = this;
+    var coordinates = Map.selector.getSelection();
+    var data = {
+      "x": coordinates.x1,
+      "y": coordinates.y1,
+      "w": coordinates.width,
+      "h": coordinates.height,
+    };
+    Map
+    .createArea(id, data)
+    .addFlag(id, 'changed')
+    .addFlag(id, 'selected')
+    .refreshMap()
+
+    Map.selector.cancelSelection();
+
+    $('#convert').hide();
   },
 
   /**
@@ -237,26 +284,27 @@ AreaMapper.prototype = {
    * @return {this}
    */
   renderArea: function(area) {
-    var base = this;
+    var Map = this;
     var cssId = this.options.cssPrefix + area.id;
     var $area = $('#' + cssId);
     if ($area.length === 0) {
-      var mapper = this;
+      
       var $deleteButton = $('<a href="#" title="Click to delete this area" class="' + this.options.cssPrefix + 'delete"></a>').click(function () {
-        if (base.options.confirm("Are you sure you want to delete this area?")) {
-          mapper.deleteArea(area.id).refreshMap();
+
+        if (Map.options.confirm("Are you sure you want to delete this area?")) {
+          Map.deleteArea(area.id).refreshMap();
         }
       });
       $area = $('<div id="' + cssId + '"/>').addClass(this.options.cssPrefix + 'area')
       .html($deleteButton)
       .click(function () {
-        if (area.id === base.state.selected) {
-          mapper.deselectArea(area.id);
+        if (area.id === Map.state.selected) {
+          Map.deselectArea(area.id);
         }
         else {
-          mapper.selectArea(area.id);
+          Map.selectArea(area.id);
         }
-        mapper.refreshMap();
+        Map.refreshMap();
       });
       
       $(this.element).after($area);
@@ -295,8 +343,9 @@ AreaMapper.prototype = {
    *   if there is no callback defined.
    */
   callbackInvoke: function (op, data) {
-    if (typeof this.options.callbacks[op] === 'function') {
-      var json = JSON.stringify(data);
+    if (typeof this.options.callbacks !== 'undefined'
+      && typeof this.options.callbacks[op] === 'function') {
+      var json = data ? JSON.stringify(data) : '';
       return this.options.callbacks[op](op, json, data);
     }
 
@@ -308,10 +357,27 @@ AreaMapper.prototype = {
    * Handle initializing of AreaMapper object.
    */
   init: function () {
+    var Map = this;
+
+    $('#convert').hide();
+
+    $(Map.element)
+    .addClass(Map.options.cssPrefix + 'processed')
+    
     // Wrapper for containing our absolutely positioned elements.
-    $(this.element)
-    .addClass(this.options.cssPrefix + 'processed')
-    .wrap('<div class="' + this.options.cssPrefix + 'container"/>');
+    .wrap('<div class="' + Map.options.cssPrefix + 'container"/>');
+
+    // Establish connection to imgareaselect plugin.
+    var options = Map.options.imgAreaSelect || {};
+
+    // Nobody should be able to hijack this method.
+    options.instance = true;
+    options.onSelectEnd = function(img, coordinates) {
+      Map.onSelectEnd(img, coordinates);
+    };
+    Map.selector = $(Map.element).imgAreaSelect(options);
+
+    Map.callbackInvoke('init');
   },
 };
 
@@ -328,8 +394,15 @@ $.fn.areaMapper.defaults = {
     return confirm(prompt);
   },
   "callbacks": {
+    "init": null,
     "select": null,
     "delete": null,
+  },
+
+  // imgareaselect options
+  // http://odyniec.net/projects/imgareaselect/usage.html
+  "imgAreaSelect": {
+    "handles": false,
   },
   
   // A prefix for all css classes
