@@ -19,52 +19,50 @@ html {
 
 /* line 28, ../sass/theme.scss */
 div.am-help {
-  border-bottom: 1px solid #ccc;
   color: #666;
   display: block;
   font-size: 16px;
   margin-bottom: 20px;
-  padding-bottom: 15px;
   width: 320px;
 }
 
-/* line 40, ../sass/theme.scss */
+/* line 38, ../sass/theme.scss */
 #node-edit-column {
   float: left;
   width: 320px;
 }
 
-/* line 47, ../sass/theme.scss */
+/* line 45, ../sass/theme.scss */
 #area-mapper-edit-form-wrapper {
   float: none;
   margin-bottom: 20px;
   width: 100%;
 }
-/* line 53, ../sass/theme.scss */
+/* line 51, ../sass/theme.scss */
 #area-mapper-edit-form-wrapper .form-item {
   margin-bottom: 20px;
   width: 100%;
 }
-/* line 59, ../sass/theme.scss */
+/* line 57, ../sass/theme.scss */
 #area-mapper-edit-form-wrapper label {
   display: block;
   font-weight: 700;
 }
-/* line 65, ../sass/theme.scss */
+/* line 63, ../sass/theme.scss */
 #area-mapper-edit-form-wrapper input {
   border: 1px solid #ccc;
   display: block;
   padding: 5px;
   width: 320px;
 }
-/* line 73, ../sass/theme.scss */
+/* line 71, ../sass/theme.scss */
 #area-mapper-edit-form-wrapper .description {
   color: #666;
   font-size: 13px;
   margin: 5px 0;
 }
 
-/* line 82, ../sass/theme.scss */
+/* line 80, ../sass/theme.scss */
 button {
   background: #ededed;
   border: 1px solid #E4E4E4;
@@ -85,16 +83,4 @@ button {
   -ms-border-radius: 20px;
   -o-border-radius: 20px;
   border-radius: 20px;
-}
-
-/* line 104, ../sass/theme.scss */
-a.am-delete,
-a.am-delete:visited {
-  background-color: transparent !important;
-  background-image: url(../images/icon-delete.png);
-  background-position: 50% 50%;
-  background-repeat: no-repeat;
-  border: none !important;
-  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
-  opacity: 1;
 }

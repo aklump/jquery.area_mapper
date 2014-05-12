@@ -39,35 +39,38 @@ body.am-ajaxing {
 
 .am-area {
   cursor: pointer;
-  background-color: #38A2DC;
+  background-color: rgba(#38A2DC, .45);
   border: $border_width solid transparent;
-  opacity: .6;
   position: relative;
+
   div.delete {
     display: none;
   }
 }
 .am-selected {
-  background-color: #44AC4B;
+  background-color: rgba(#44AC4B, .6);
   
   .am-resize,
   .am-delete {
     display: block;
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     position: absolute;
     bottom: 0;
     border: 2px solid;
   }
   .am-resize {
-    background-color: #8a00fd;
+    background-color: rgba(#8a00fd, .45);
     border-color: #8a00fd;
     left: 0;
   }
-  .am-delete {  
-    background-color: #ff0000;
+  .am-delete {
+    background-color: transparent;
+    background-image: url(../images/icon-delete.png);
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    border: none;
     right: 0;
-    border-color: #ff0000;
   }
 }
 .am-resizing{
