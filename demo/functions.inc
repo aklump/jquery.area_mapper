@@ -81,31 +81,45 @@ function write_to_log($method, $args, $data) {
 
 function render_form($node = array(), $id = NULL) {
   $fields = array(
+    'title' => array('Title', 'textfield', "Displayed on the ad as the product title.<br><strong>Note</strong>: This title <em>is</em> public facing."),
+    'field_product[und][0][target_id]' => array('Product', 'textfield', "Enter the product's name here."),
     'field_area_json' => array('', 'hidden', ''),
-    'field_product' => array('Product', 'textfield', ''),
-    'field_price' => array('Price', 'textfield', ''),
-    'title' => array('Title', 'textfield', ''),
+    'field_description[und][0][value]' => array('Description', 'textfield',  'Displayed on the ad as the product title.<br><strong>Note</strong>: This title <em>is</em> public facing.'),
+    'field_price[und][0][value]' => array('Price', 'textfield', '<strong>Examples:</strong><br>
+$3.99/ea.<br>
+$2.99 when you buy 4<br>
+$.79/lb.'),
+    
   );
   $output   = array();
-  $output[] = '<form>';
-  foreach ($fields as $key => $item) {
-    list($label, $type, $value) = $item;
-    if (!empty($node->{$key})) {
-      $value = $node->{$key};
+  $output[] = '<form class="node-form node-product_display-form" action="/node/add/product-display" method="post" id="product-display-node-form" accept-charset="UTF-8">';
+  foreach ($fields as $name => $item) {
+    $value = '';
+    list($label, $type, $description) = $item;
+    if (!empty($node->{$name})) {
+      $value = $node->{$name};
     }
+
+    $name = preg_replace('/[^\-a-z0-9]/', '-', $name);
+    $name = trim(preg_replace('/\-{2,}/', '-', $name), '-');
+    $id = "edit-$name";
     switch ($type) {
       case 'hidden':
-        $output[] = "<input type=\"hidden\" name=\"$key\" id=\"edit-$key\"/>";
+        $output[] = "<input type=\"hidden\" name=\"$name\" id=\"$id\"/>";
         break;
 
       case 'textarea':
-        $output[] = "<div class=\"form-item\"><label>$label <textarea name=\"$key\" id=\"edit-$key\"/>$value</textarea></label></div>";
+        $output[] = "<div class=\"form-item\"><label for=\"$id\">$label <textarea name=\"$name\" id=\"$id\"/>$value</textarea></label></div>";
         break;
 
       case 'textfield':
-        $output[] = "<div class=\"form-item\"><label>$label <input type=\"text\" value=\"$value\" name=\"$key\" id=\"edit-$key\"/></label></div>";
+        $output[] = "<div class=\"form-item\"><label for=\"$id\">$label <input type=\"text\" value=\"$value\" name=\"$name\" id=\"$id\"/ class=\"form-text\"></label></div>";
         break;
     }
+    if ($description) {
+      $output[] = '<div class="description">' . $description . '</div>';
+    }
+    
   }
 
   // if ($id) {
