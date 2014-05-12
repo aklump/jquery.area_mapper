@@ -135,6 +135,8 @@ AreaMapper.prototype = {
     .hideControls()    
     .refreshMap();
 
+    Map.callbackInvoke('onSelectCancel', {});    
+
     return this;
   },
 
@@ -649,6 +651,23 @@ AreaMapper.prototype = {
       return false;
     });
 
+    $(Map.options.controls.deleteTrigger)
+    .not('.' + prefix + 'processed')
+    .addClass(prefix + 'processed')
+    .click(function () {
+      Map.state.op = 'delete';
+      Map.refreshBodyClasses();
+      if (Map.options.confirm("Are you sure you want to delete this area?")) {
+        Map.state.op = 'create';
+        Map
+        .deleteArea(Map.state.selected)
+        .selectorCancel()
+        .refreshMap();
+      }
+
+      return false;
+    });      
+
     $(Map.options.controls.createCancel)
     .not('.' + prefix + 'processed')
     .addClass(prefix + 'processed')
@@ -679,19 +698,6 @@ AreaMapper.prototype = {
       return false;
     });
 
-    $(Map.options.controls.deleteTrigger)
-    .not('.' + prefix + 'processed')
-    .addClass(prefix + 'processed')
-    .click(function () {
-      Map.state.op = 'delete';
-      Map.refreshBodyClasses();
-      if (Map.options.confirm("Are you sure you want to delete this area?")) {
-        Map.deleteArea(Map.state.selected)
-      }
-      Map.state.op = 'create';
-      Map.refreshMap();    
-    });  
-
     Map
     .refreshMap()
     .callbackInvoke('init');
@@ -719,6 +725,7 @@ $.fn.areaMapper.defaults = {
     "delete": null,
     "onSelectStart": null,
     "onSelectEnd": null,
+    "onSelectCancel": null,
   },
 
   // Define the jquery selectors for all our op controls.

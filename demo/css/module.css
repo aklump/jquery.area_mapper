@@ -3,8 +3,9 @@
   display: none;
 }
 
-/* line 6, ../sass/module.scss */
+/* line 7, ../sass/module.scss */
 body.am-op-update .am-form,
+body.am-op-delete .am-form,
 body.am-selector-selected .am-form {
   display: block;
 }

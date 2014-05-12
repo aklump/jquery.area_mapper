@@ -19,9 +19,10 @@
           Map.createArea(response.items[i].nid, json);
         }
         Map.refreshMap();
+        defaultText();
         setTitle(response.title);
         setForm(response.form);
-        defaultHelp();
+        
       });
     }
 
@@ -69,9 +70,9 @@
       });      
     }
 
-    function serverDelete(area) {
+    function serverDelete(id) {
       $.ajax({
-        url: 'server.php?id=' + area.id,
+        url: 'server.php?id=' + id,
         type: 'DELETE',
         dataType: 'json',
         success: function(response) {
@@ -103,7 +104,8 @@
       $('.am-help').html(help);
     }
 
-    function defaultHelp() {
+    function defaultText() {
+      setTitle('New Product Display');
       var help = '';
       help += 'Click and drag to define the boundaries of a new product display.';
       if (Map.areas.length > 0) {
@@ -139,6 +141,9 @@
         "onSelectEnd": function(op, json, data) {
           setHelp('Fill out and save form, or click Cancel.');
         },
+        "onSelectCancel": function () {
+          defaultText();
+        },
         "select": function(op, json, data) {
           setHelp('Resize or move the area boundaries.  You may also edit the details in the form then click the Update button.');
           serverRead(data.id, json);
@@ -148,7 +153,7 @@
         //   defaultHelp();
         // },
         "delete": function(op, json, data) {
-          serverDelete(data);
+          serverDelete(data.id);
         }
       }
     });

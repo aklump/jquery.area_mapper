@@ -8,3 +8,4 @@ demo/externs/jquery-1.4.4.min.min.js
 demo/externs/jquery.imgareaselect/scripts/jquery.min.min.js
 demo/externs/jquery.imgareaselect/scripts/jquery.imgareaselect.pack.min.js
 demo/log.json
+demo/js/module.min.js

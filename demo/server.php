@@ -31,15 +31,26 @@ switch ($method) {
     $request = $_POST;
     $nid = node_save($request);
     $response = (object) array(
-      'title' => 'New Product Display',
       'items' => array(node_load($nid)),
+      'title' => 'New Product Display',
       'form' => render_form(),
     );
     break;
+
+  case 'PUT':
+    $request = $_POST;
+    node_save($request, $id);
+    $response = (object) array(
+      'items' => array(node_load($id)),
+      'title' => 'New Product Display',
+      'form' => render_form(),
+    );
+    break;
+
   case 'GET':
     $response = (object) array(
-      'title' => 'New Product Display',
       'items' => node_load_all(),
+      'title' => 'New Product Display',
       'form' => render_form(),
     );
     if ($id) {
