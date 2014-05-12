@@ -12,7 +12,7 @@ div.am-help {
 /* line 24, ../sass/theme.scss */
 #area-mapper-edit-form-wrapper {
   float: none;
-  margin: 0;
+  margin-bottom: 20px;
   width: 100%;
 }
 
