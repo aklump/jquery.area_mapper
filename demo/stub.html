@@ -8,25 +8,28 @@
   <style type="text/css" media="all">
     @import url("externs/jquery.imgareaselect/css/imgareaselect-animated.css");
     @import url("area_mapper.css");
+    @import url("css/theme.css");
   </style>
 </head>
 <body>
 
 <img id="area-mapper" src="images/yokes_salesad.jpg" alt="ad-map">
 
-<h1 class="am-title">Loading...</h1>
+<div id="node-edit-column">
+  <h1 class="am-title">Loading...</h1>
 
-<div id="area-mapper-edit-form-wrapper">
-  <form class="am-form" />
+  <div id="area-mapper-edit-form-wrapper">
+    <form class="am-form" />
+  </div>
+
+  <div id="area-mapper-controls">
+    <button id="new-create">Save</button>
+    <button id="resize-save">Update</button>
+    <button id="cancel">Cancel</button>  
+  </div>
+
+  <div class="am-help"></div>
 </div>
-
-<div id="area-mapper-controls">
-  <button id="new-create">Save</button>
-  <button id="resize-save">Update</button>
-  <button id="cancel">Cancel</button>  
-</div>
-
-<div class="am-help"></div>
 
 <!-- <form action="" id="areaEditForm">
   <div><label>Json: <textarea id="areaJson" name="areaJson" rows="2" cols="50"></textarea></label></div>

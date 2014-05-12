@@ -1,0 +1,39 @@
+/* line 12, ../sass/theme.scss */
+div.am-help {
+  border-top: 1px solid #ccc;
+  color: #666;
+  display: block;
+  font-size: 12px;
+  padding-top: 20px;
+  width: 213px;
+}
+
+/* line 23, ../sass/theme.scss */
+#area-mapper-edit-form-wrapper {
+  float: none;
+  margin: 0;
+  width: 100%;
+}
+
+/* line 31, ../sass/theme.scss */
+#node-edit-column {
+  float: left;
+}
+
+/* line 40, ../sass/theme.scss */
+#area-mapper-edit-form-wrapper .form-item {
+  margin-bottom: 10px;
+  width: 200px;
+}
+/* line 46, ../sass/theme.scss */
+#area-mapper-edit-form-wrapper label {
+  display: block;
+  font-weight: 700;
+}
+/* line 52, ../sass/theme.scss */
+#area-mapper-edit-form-wrapper input {
+  border: 1px solid #ccc;
+  display: block;
+  padding: 5px;
+  width: 200px;
+}
