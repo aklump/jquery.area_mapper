@@ -1,57 +1,70 @@
-/* line 10, ../sass/theme.scss */
+/* apply a natural box layout model to all elements */
+/* line 11, ../sass/theme.scss */
+*, *:before, *:after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* line 16, ../sass/theme.scss */
 html {
   padding: 10px;
 }
 
-/* line 15, ../sass/theme.scss */
+/* line 21, ../sass/theme.scss */
 .am-container {
   border-right: 1px solid #ccc;
   padding-right: 20px;
 }
 
-/* line 22, ../sass/theme.scss */
+/* line 28, ../sass/theme.scss */
 div.am-help {
   border-bottom: 1px solid #ccc;
   color: #666;
   display: block;
-  font-size: 14px;
+  font-size: 16px;
   margin-bottom: 20px;
   padding-bottom: 15px;
-  width: 313px;
+  width: 320px;
 }
 
-/* line 34, ../sass/theme.scss */
+/* line 40, ../sass/theme.scss */
+#node-edit-column {
+  float: left;
+  width: 320px;
+}
+
+/* line 47, ../sass/theme.scss */
 #area-mapper-edit-form-wrapper {
   float: none;
   margin-bottom: 20px;
   width: 100%;
 }
-
-/* line 42, ../sass/theme.scss */
-#node-edit-column {
-  float: left;
-  width: 300px;
-}
-
-/* line 52, ../sass/theme.scss */
+/* line 53, ../sass/theme.scss */
 #area-mapper-edit-form-wrapper .form-item {
-  margin-bottom: 10px;
-  width: 300px;
+  margin-bottom: 20px;
+  width: 100%;
 }
-/* line 58, ../sass/theme.scss */
+/* line 59, ../sass/theme.scss */
 #area-mapper-edit-form-wrapper label {
   display: block;
   font-weight: 700;
 }
-/* line 64, ../sass/theme.scss */
+/* line 65, ../sass/theme.scss */
 #area-mapper-edit-form-wrapper input {
   border: 1px solid #ccc;
   display: block;
   padding: 5px;
-  width: 300px;
+  width: 320px;
+}
+/* line 73, ../sass/theme.scss */
+#area-mapper-edit-form-wrapper .description {
+  color: #666;
+  font-size: 13px;
+  margin: 5px 0;
 }
 
-/* line 74, ../sass/theme.scss */
+/* line 82, ../sass/theme.scss */
 button {
   background: #ededed;
   border: 1px solid #E4E4E4;
@@ -74,7 +87,7 @@ button {
   border-radius: 20px;
 }
 
-/* line 96, ../sass/theme.scss */
+/* line 104, ../sass/theme.scss */
 a.am-delete,
 a.am-delete:visited {
   background-color: transparent !important;
