@@ -10,7 +10,7 @@ function node_load_all() {
     && ($data = trim(file_get_contents('database.json')))) {
     $data = (array) json_decode($data);
     foreach ($data as $d) {
-      $nodes[$d->id] = $d;
+      $nodes[$d->nid] = $d;
     }
   }
   
@@ -30,9 +30,6 @@ function node_load($nid) {
 /**
  * Update an existing node
  *
- * @param  string $id   [description]
- * @param  [type] $data [description]
- *
  * @return bool       
  */
 function node_save($data, $nid = NULL) {
@@ -43,16 +40,23 @@ function node_save($data, $nid = NULL) {
   elseif (!$nid) {
     $nid = 0;
     foreach ($nodes as $node) {
-      $nid = max($nid, $node->id);
+      $nid = max($nid, $node->nid);
     }
     $nid += 1;
   }
-  $node = (object) $data;
-  $node->id = $nid;
+  $node = new \stdClass;
+  $node->nid = $nid;
+
+  foreach ($data as $key => $value) {
+    $key = str_replace('edit_', '', $key);
+    $node->{$key} = $value;
+  }
+
   $node->field_area_json = json_decode($node->field_area_json);
   $node->field_area_json->id = $nid;
   unset($node->field_area_json->flags->selected);
   unset($node->field_area_json->flags->changed);
+
   $nodes[$nid] = $node;
   node_save_all($nodes);
 
@@ -96,30 +100,27 @@ $.79/lb.'),
   foreach ($fields as $name => $item) {
     $value = '';
     list($label, $type, $description) = $item;
+    $id = preg_replace('/[^\-a-z0-9]/', '-', $name);
+    $id = trim(preg_replace('/\-{2,}/', '-', $id), '-');
+    $name = str_replace('-', '_', "edit-$id");
+
     if (!empty($node->{$name})) {
       $value = $node->{$name};
     }
 
-    $name = preg_replace('/[^\-a-z0-9]/', '-', $name);
-    $name = trim(preg_replace('/\-{2,}/', '-', $name), '-');
-    $id = "edit-$name";
     switch ($type) {
       case 'hidden':
-        $output[] = "<input type=\"hidden\" name=\"$name\" id=\"$id\"/>";
+        $output[] = '<input type="hidden" name="' . $name . '" id="' . $id . '"/>';
         break;
 
       case 'textarea':
-        $output[] = "<div class=\"form-item\"><label for=\"$id\">$label <textarea name=\"$name\" id=\"$id\"/>$value</textarea></label></div>";
+        $output[] = '<div class="form-item"><label for="' . $id . '">' . $label . ' <textarea name="' . $name . '" id="' . $id . '"/>' . $value . '</textarea></label></div>';
         break;
 
       case 'textfield':
-        $output[] = "<div class=\"form-item\"><label for=\"$id\">$label <input type=\"text\" value=\"$value\" name=\"$name\" id=\"$id\"/ class=\"form-text\"></label></div>";
+        $output[] = '<div class="form-item"><label for="' . $id . '">' . $label . ' </label><input type="text" value="' . $value . '" name="' . $name . '" id="' . $id . '"/ class="form-text"><div class="description">' . $description . '</div></div>';
         break;
     }
-    if ($description) {
-      $output[] = '<div class="description">' . $description . '</div>';
-    }
-    
   }
 
   // if ($id) {
