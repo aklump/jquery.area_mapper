@@ -1,0 +1,9 @@
+/* line 1, ../sass/module.scss */
+.am-form {
+  display: none;
+}
+
+/* line 5, ../sass/module.scss */
+body.am-selector-selected .am-form {
+  display: block;
+}

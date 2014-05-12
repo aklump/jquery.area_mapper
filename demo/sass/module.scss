@@ -1,0 +1,8 @@
+.am-form {
+  display: none;
+}
+body.am-selector-selected {
+  .am-form {
+    display: block;
+  }
+}

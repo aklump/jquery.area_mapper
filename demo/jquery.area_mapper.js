@@ -90,7 +90,12 @@ AreaMapper.prototype = {
    */
   onSelectEnd: function (img, selection) {
     var Map = this;
-    Map.showControls();
+
+    if (Map.state.selectorOp === 'selecting') {
+      Map.state.selectorOp = 'selected';
+    }
+
+    Map.showControls().refreshMap();
 
     var data = {};
     if (typeof selection !== "undefined") {
@@ -358,6 +363,7 @@ AreaMapper.prototype = {
     // Handle this.element classes
     $('body').removeClass(prefix + 'selector-hidden');
     $('body').removeClass(prefix + 'selector-selecting');
+    $('body').removeClass(prefix + 'selector-selected');
     $('body').removeClass(prefix + 'selector-resizing');
     $('body').addClass(prefix + 'selector-' + Map.state.selectorOp);
 
