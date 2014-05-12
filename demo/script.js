@@ -16,7 +16,7 @@
       $.getJSON('server.php', function (response) {
         for (i in response.items) {
           var json = response.items[i].field_area_json;
-          Map.createArea(response.items[i].id, json);
+          Map.createArea(response.items[i].nid, json);
         }
         Map.refreshMap();
         setTitle(response.title);
@@ -43,7 +43,7 @@
         data: formValues,
         dataType: 'json',
         success: function(response) {
-          if (response.items[0].id) {
+          if (response.items[0].nid) {
             var newId = response.items[0].field_area_json.id;
             var data = response.items[0].field_area_json;
             Map
@@ -92,7 +92,7 @@
     }
 
     function setFormJson(json) {
-      getForm().find('#edit-field_area_json').val(json);
+      getForm().find('#field-area-json').val(json);
     }
 
     function clearForm() {

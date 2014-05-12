@@ -17,24 +17,6 @@ $areas = array(
   (object) (array('id' => 'vc349', 'x' => 340) + $defaults),
 );
 
-// $form_data = array(
-//   'as1199' => (object) array(
-//     'product' => 'WASSF',
-//     'price' => '$11.99/lb',
-//     'title' => 'Wild, Alaskan Sockeye Salmon Fillets',
-//   ),
-//   'pr599' => (object) array(
-//     'product' => 'FPRF',
-//     'price' => '$5.99/lb',
-//     'title' => 'Fresh Pacific Rockfish Fillets',
-//   ),
-//   'vc349' => (object) array(
-//     'product' => 'FVC',
-//     'price' => '$3.49/lb',
-//     'title' => 'Fresh Venus Clams',
-//   ),
-// );
-
 $response = new stdClass;
 switch ($method) {
   case 'DELETE':
