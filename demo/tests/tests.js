@@ -1,6 +1,35 @@
 var result, control = null;
 
-test('createAreaFromSelection', function () {
+test('getNextId', function () {
+  var $target = $('#area-mapper')
+  .clone()
+  .appendTo($('body'))
+  .addClass('qunit-test');
+  var Map  = $target.areaMapper();
+
+  strictEqual(Map.getNextId(), 1, 'Initial getNextId() returns 1.');
+  Map.createArea(1, {
+    x: 100, y: 100, w: 100, h: 100
+  });
+  strictEqual(Map.getNextId(), 2, 'getNextId() returns 2.');
+  Map.createArea('do', {
+    x: 100, y: 100, w: 100, h: 100
+  });
+  Map.createArea('re', {
+    x: 100, y: 100, w: 100, h: 100
+  });
+  Map.createArea('mi', {
+    x: 100, y: 100, w: 100, h: 100
+  });  
+  strictEqual(Map.getNextId(), 2, 'getNextId() returns 2 when several non-numerics are created.');
+  Map.createArea(14, {
+    x: 100, y: 100, w: 100, h: 100
+  });    
+  strictEqual(Map.getNextId(), 15, 'getNextId() returns 16.');
+
+});
+
+test('saveAreaFromSelection', function () {
   var $target = $('#area-mapper')
   .clone()
   .appendTo($('body'))
@@ -19,15 +48,16 @@ test('createAreaFromSelection', function () {
   Map.selector.update();
   ok($('.imgareaselect-selection:visible').length, "Selector is visible in the DOM.");
 
-  result = Map.createAreaFromSelection('do');
-  strictEqual(result, Map, 'createAreaFromSelection() returns self.');
+  result = Map.saveAreaFromSelection('do');
+  // strictEqual(result.id, 'do', 'saveAreaFromSelection() returns area object with correct id.');
+  strictEqual(result, Map, 'saveAreaFromSelection() returns self.');
 
   ok(!$('.imgareaselect-selection:visible').length, "Selector is not visible in the DOM.");
 
-  control = {"x": 45, "y": 55, "w": 20, "h": 25, "id": "do", "flags": {
-    "changed": "changed",
-    "selected": "selected"
-  }};
+  control = {"x": 45, "y": 55, "w": 20, "h": 25, "id": "do", "flags": {}};
+  //   "changed": "changed",
+  //   "selected": "selected"
+  // }};
   propEqual(Map.readArea('do'), control, "Do area was created with correct params.")
 
   strictEqual(newTest, true, "new callback was called correctly.");

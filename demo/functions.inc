@@ -103,9 +103,10 @@ $.79/lb.'),
     $id = preg_replace('/[^\-a-z0-9]/', '-', $name);
     $id = trim(preg_replace('/\-{2,}/', '-', $id), '-');
     $name = str_replace('-', '_', "edit-$id");
+    $node_key = str_replace('-', '_', $id);
 
-    if (!empty($node->{$name})) {
-      $value = $node->{$name};
+    if (!empty($node->{$node_key})) {
+      $value = $node->{$node_key};
     }
 
     switch ($type) {

@@ -5,7 +5,7 @@
     .ajaxStart(function () {
       $('body')
       .addClass(Map.options.cssPrefix + 'ajaxing');
-      setTitle('Please wait...');
+      setTitle('Loading, please wait...');
     })
     .ajaxComplete(function () {
       $('body')
@@ -95,10 +95,6 @@
       getForm().find('#field-area-json').val(json);
     }
 
-    function clearForm() {
-      setForm('<form class="am-form"/>');
-    }
-
     function setTitle(title) {
       $('.am-title').html(title);
     }
@@ -109,7 +105,7 @@
 
     function defaultHelp() {
       var help = '';
-      help += 'Using mouse drag to define the rectangle area of a product.';
+      help += 'Click and drag to define the boundaries of a new product display.';
       if (Map.areas.length > 0) {
         help += ' Or click on an existing area to edit.';
       };
@@ -134,17 +130,23 @@
           var formValues = getForm().serialize();
           serverCreate(formValues);
         },
+        "onSelectStart": function(op, json, data) {
+          if (Map.state.op === 'create') {
+            refreshFromServer();
+          };
+          setHelp('Fill out and save form, or click Cancel.');
+        },
         "onSelectEnd": function(op, json, data) {
           setHelp('Fill out and save form, or click Cancel.');
         },
         "select": function(op, json, data) {
-          setHelp('Click the purple square to resize, the red square to delete, or the green to cancel.  You may also edit the details in the form then click the Update button.');
+          setHelp('Resize or move the area boundaries.  You may also edit the details in the form then click the Update button.');
           serverRead(data.id, json);
         },
-        "deselect": function () {
-          refreshFromServer();
-          defaultHelp();
-        },
+        // "deselect": function () {
+        //   refreshFromServer();
+        //   defaultHelp();
+        // },
         "delete": function(op, json, data) {
           serverDelete(data);
         }
@@ -153,9 +155,9 @@
 
     refreshFromServer();
 
-    $('#cancel').click(function () {
-      defaultHelp();
-    });
+    // $('#cancel').click(function () {
+      // defaultHelp();
+    // });
 
 
   });

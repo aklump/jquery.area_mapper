@@ -49,7 +49,7 @@ switch ($method) {
       else {
         $response = new \stdClass;
         $response->title = 'Edit ' . $node->title;
-        $response->items = array($node->id => $node);
+        $response->items = array($node->nid => $node);
         $response->form = render_form($node, $id);      
       }
     }
