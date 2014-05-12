@@ -453,14 +453,14 @@ AreaMapper.prototype = {
         }
       });
 
-      var $resizeButton = $('<a href="#" title="Click to resize this area" class="' + prefix + 'resize"></a>').click(function () {
-        Map.state.selectorOp = 'resizing';
-        Map.activateSelectionFromArea(area.id);
-      });
+      // var $resizeButton = $('<a href="#" title="Click to resize this area" class="' + prefix + 'resize"></a>').click(function () {
+      //   Map.state.selectorOp = 'resizing';
+      //   Map.activateSelectionFromArea(area.id);
+      // });
 
       $area = $('<div id="' + cssId + '"/>').addClass(prefix + 'area')
       .html($deleteButton)
-      .append($resizeButton)
+      // .append($resizeButton)
       .click(function () {
         if (area.id === Map.state.selected) {
           Map.deselectArea(area.id);
