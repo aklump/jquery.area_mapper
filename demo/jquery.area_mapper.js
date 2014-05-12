@@ -16,38 +16,62 @@
 function AreaMapper(element, options) {
   this.element = element;
 
+  // Holds the image element this is applied to.
+  this.element = element;
+
+  // Holds the containing element as a jquery object.
+  this.$container = null;
+
+  // An area to hold all the created area objects.
+  this.areas = [];
+
+  // Will hold the instance of imgAreaSelect
+  this.selector = null;
+
+  // An object to hold various states of the AreaMapper object.
+  this.state = {
+
+    // The id of the currently selected area
+    "selected": null,
+    
+    // hidden, selecting, resizing, 
+    "selectorOp": 'hidden',
+  };
+
+  // An object to hold render instructions such as dom objects that have
+  // been deleted and need to be removed.
+  this.render = {
+    // An array of jquery selectors to be removed on next refresh.
+    "remove": [],
+
+    // An array of elements and flags to remove on next refresh.
+    "removeFlag": []
+  };
+
   // jQuery has an extend method that merges the 
   // contents of two or more objects, storing the 
   // result in the first object. The first object 
   // is generally empty because we don't want to alter 
   // the default options for future instances of the plugin
-  this.options = $.extend( {}, $.fn.areaMapper.defaults, options) ;
+  this.options = $.extend({}, $.fn.areaMapper.defaults, options);  
 
   this.init();
 }
 
 AreaMapper.prototype = {
 
-  // An area to hold all the created area objects.
-  areas: [],
+  onSelectStart: function (img, selection) {
+    var Map = this;
 
-  // Holds various timers as needed in the object scope.
-  timers: {},
+    if (Map.state.selectorOp === 'hidden') {
+      Map.state.selectorOp = 'selecting';
+    }
 
-  // Will hold the instance of imgAreaSelect
-  selector: null,
+    Map.deselectArea(Map.state.selected).refreshMap();
 
-  // An object to hold various states of the AreaMapper object.
-  state: {"selected": null},
+    Map.callbackInvoke('onSelectStart', {});
 
-  // An object to hold render instructions such as dom objects that have
-  // been deleted and need to be removed.
-  render: {
-    // An array of jquery selectors to be removed on next refresh.
-    "remove": [],
-
-    // An array of elements and flags to remove on next refresh.
-    "removeFlag": []
+    return this;
   },
 
   /**
@@ -66,11 +90,43 @@ AreaMapper.prototype = {
    */
   onSelectEnd: function (img, selection) {
     var Map = this;
-    $('#convert').show().click(function () {
-      Map.createAreaFromSelection();
-    });
+    Map.showSelectorControls();
+
+    var data = {};
+    if (typeof selection !== "undefined") {
+      data = {
+        x: selection.x1,
+        y: selection.y1,
+        w: selection.width,
+        h: selection.height,        
+      };
+    }
+
+    Map.callbackInvoke('onSelectEnd', data);
+
+    return this;
   },
 
+  selectorCancel: function () {
+    var Map = this;
+
+    Map.selector.cancelSelection();
+    
+    Map.state.selectorOp = 'hidden';
+    Map
+    .removeFlagFromAll('resizing')
+    .refreshMap();
+
+    return this;
+  },
+
+  /**
+   * Creats a new area using id from the current selection.
+   *
+   * @param  {string} id The id of the area about to be created.
+   *
+   * @return {self}    
+   */
   createAreaFromSelection: function (id) {
     var Map = this;
     var coordinates = Map.selector.getSelection();
@@ -80,15 +136,49 @@ AreaMapper.prototype = {
       "w": coordinates.width,
       "h": coordinates.height,
     };
+
+    Map.state.selectorOp = 'hidden';
     Map
     .createArea(id, data)
     .addFlag(id, 'changed')
     .addFlag(id, 'selected')
-    .refreshMap()
+    .refreshMap();
 
     Map.selector.cancelSelection();
 
-    $('#convert').hide();
+    Map.callbackInvoke('new', Map.readArea(id));
+
+    return this;
+  },
+
+  /**
+   * Converts an area into a resizing area and sets the selector.
+   *
+   * @param  {string} id
+   *
+   * @return {bool}
+   */
+  activateSelectionFromArea: function (id) {
+    var Map = this;
+    var data = Map.readArea(id);
+    if (data === false) {
+      return false;
+    };
+
+    Map.selector.setSelection(data.x, data.y, data.x + data.w, data.y + data.h);
+    Map.addFlag(id, 'resizing');
+    Map.selector.update();
+
+    var options = Map.selector.getOptions();
+    options.show = true;
+    Map.selector.setOptions(options);
+
+    $(Map.options.controls.resizeAccept).show();
+    $(Map.options.controls.resizeCancel).show();
+
+    Map.refreshMap();
+
+    return true;
   },
 
   /**
@@ -116,7 +206,7 @@ AreaMapper.prototype = {
    * @return {object||false}
    */
   readArea: function (id) {
-    return typeof this.areas[id] === undefined ? false : this.areas[id];
+    return typeof this.areas[id] === "undefined" ? false : this.areas[id];
   },
 
   /**
@@ -258,20 +348,81 @@ AreaMapper.prototype = {
    * @return {this}
    */
   refreshMap: function () {
+    var Map = this;
+
+    var prefix = this.options.cssPrefix;
+
+    // Handle this.element classes
+    $('body').removeClass(prefix + 'selector-hidden');
+    $('body').removeClass(prefix + 'selector-selecting');
+    $('body').removeClass(prefix + 'selector-resizing');
+    $('body').addClass(prefix + 'selector-' + Map.state.selectorOp);
+
+    if (Map.state.selected) {
+      $('body').addClass(prefix + 'op-edit');
+    }
+    else {
+      $('body').removeClass(prefix + 'op-edit');
+    }
 
     // Remove pending areas from DOM.
-    for (var i in this.render.remove) {
-      $(this.render.remove[i]).remove();
-      delete this.render.remove[i];
+    for (var i in Map.render.remove) {
+      $(Map.render.remove[i]).remove();
+      delete Map.render.remove[i];
     }
 
     // Update existings areas in the DOM.
-    for (var id in this.areas) {
-      var area = this.readArea(id);
+    for (var id in Map.areas) {
+      var area = Map.readArea(id);
       if (area) {
-        this.renderArea(area);
+        Map.renderArea(area);
       }
     }
+
+    // if (Map.state.selectorOp === 'hidden') {
+    //   Map.hideSelectorControls();
+    // }
+    // else {
+    //   Map.showSelectorControls();  
+    // }
+
+    return this;
+  },
+
+    /**
+   * Displays the appropriate selector controls based on selectorOp
+   *
+   * @return {this}
+   */
+  showSelectorControls: function() {
+    var Map = this;
+
+    if (Map.state.selectorOp === 'selecting') {
+      $(Map.options.controls.newSelectionAccept).show();
+      $(Map.options.controls.newSelectionCancel).show();
+    }
+    else if (Map.state.selectorOp === 'resizing') {
+      $(Map.options.controls.resizeAccept).show();
+      $(Map.options.controls.resizeCancel).show();
+    }
+
+    Map.refreshMap();
+
+    return this;
+  },
+
+
+  /**
+   * Hides all controls associated with the selector tool.
+   *
+   * @return {self}
+   */
+  hideSelectorControls: function() {
+    var Map = this;
+    var list = 
+    $(Map.options.controls.newSelectionAccept + ',' + Map.options.controls.newSelectionCancel + ',' + Map.options.controls.resizeAccept + ',' + Map.options.controls.resizeCancel).hide();
+
+    Map.refreshMap();
 
     return this;
   },
@@ -285,18 +436,28 @@ AreaMapper.prototype = {
    */
   renderArea: function(area) {
     var Map = this;
-    var cssId = this.options.cssPrefix + area.id;
+
+    var prefix = this.options.cssPrefix;
+
+    var cssId = prefix + area.id;
     var $area = $('#' + cssId);
     if ($area.length === 0) {
-      
-      var $deleteButton = $('<a href="#" title="Click to delete this area" class="' + this.options.cssPrefix + 'delete"></a>').click(function () {
+
+      var $deleteButton = $('<a href="#" title="Click to delete this area" class="' + prefix + 'delete"></a>').click(function () {
 
         if (Map.options.confirm("Are you sure you want to delete this area?")) {
           Map.deleteArea(area.id).refreshMap();
         }
       });
-      $area = $('<div id="' + cssId + '"/>').addClass(this.options.cssPrefix + 'area')
+
+      var $resizeButton = $('<a href="#" title="Click to resize this area" class="' + prefix + 'resize"></a>').click(function () {
+        Map.state.selectorOp = 'resizing';
+        Map.activateSelectionFromArea(area.id);
+      });
+
+      $area = $('<div id="' + cssId + '"/>').addClass(prefix + 'area')
       .html($deleteButton)
+      .append($resizeButton)
       .click(function () {
         if (area.id === Map.state.selected) {
           Map.deselectArea(area.id);
@@ -321,13 +482,13 @@ AreaMapper.prototype = {
     for (var i in this.render.removeFlag) {
       var id    = this.render.removeFlag[i][0];
       var flag  = this.render.removeFlag[i][1];
-      $('#' + this.options.cssPrefix + id).removeClass(this.options.cssPrefix + flag);
+      $('#' + prefix + id).removeClass(prefix + flag);
       delete this.render.removeFlag[i];
     }
 
     // Add flags as classes
     for (var flag in area.flags) {
-      $area.addClass(this.options.cssPrefix + flag);
+      $area.addClass(prefix + flag);
     }
 
     return this;
@@ -360,24 +521,50 @@ AreaMapper.prototype = {
     var Map = this;
 
     $('#convert').hide();
+    $('body').addClass(Map.options.cssPrefix + 'processed');
 
-    $(Map.element)
+    Map.$container = $(Map.element)
     .addClass(Map.options.cssPrefix + 'processed')
+
     
     // Wrapper for containing our absolutely positioned elements.
-    .wrap('<div class="' + Map.options.cssPrefix + 'container"/>');
+    .wrap('<div class="' + Map.options.cssPrefix + 'container"/>')
+    .parent('.' + Map.options.cssPrefix + 'container');
 
     // Establish connection to imgareaselect plugin.
     var options = Map.options.imgAreaSelect || {};
 
     // Nobody should be able to hijack this method.
     options.instance = true;
+    options.onSelectStart = function(img, coordinates) {
+      Map.onSelectStart(img, coordinates);
+    };
     options.onSelectEnd = function(img, coordinates) {
       Map.onSelectEnd(img, coordinates);
     };
     Map.selector = $(Map.element).imgAreaSelect(options);
 
-    Map.callbackInvoke('init');
+    // Setup the selector controls
+    $(Map.options.controls.newSelectionAccept).click(function () {
+      Map.createAreaFromSelection(0).hideSelectorControls();
+      return false;
+    });
+    $(Map.options.controls.newSelectionCancel).click(function () {
+      Map.selectorCancel().hideSelectorControls();
+      return false;
+    });    
+    $(Map.options.controls.resizeAccept).click(function () {
+      // Map.createAreaFromSelection();
+      return false;
+    });
+    $(Map.options.controls.resizeCancel).click(function () {
+      Map.selectorCancel().hideSelectorControls();
+      return false;
+    });  
+
+    Map
+    .refreshMap()
+    .callbackInvoke('init');
   },
 };
 
@@ -389,14 +576,27 @@ $.fn.areaMapper = function(options) {
   return $.data(this[0], 'plugin_areaMapper');
 };
 
+
+// Be sure to copy the defaults object in it's entirety if you choose to alter
+// it's values (don't loos any properties).  Othewise the script may fail.
 $.fn.areaMapper.defaults = {
   "confirm": function (prompt) {
     return confirm(prompt);
   },
   "callbacks": {
     "init": null,
+    "new": null,
     "select": null,
     "delete": null,
+    "onSelectStart": null,
+    "onSelectEnd": null,
+  },
+
+  "controls": {
+    "newSelectionAccept":  '#new-create',
+    "newSelectionCancel":  '#cancel',
+    "resizeAccept":        '#resize-save',
+    "resizeCancel":        '#cancel'
   },
 
   // imgareaselect options
@@ -406,7 +606,7 @@ $.fn.areaMapper.defaults = {
   },
   
   // A prefix for all css classes
-  "cssPrefix"         : 'area-mapper-'
+  "cssPrefix"         : 'am-'
 };
 
 $.fn.areaMapper.version = function() { return '0.0.1'; };
