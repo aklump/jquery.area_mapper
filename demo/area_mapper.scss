@@ -15,8 +15,8 @@ div.am-help {
   font-size: 24px;
   margin: $global_margin 0;
 }
-#area-mapper-edit-form-wrapper.ajaxing {
-  form {
+body.am-ajaxing {
+  .am-form {
     opacity: .25;
   }
   // div.icon-ajaxing {

@@ -3,14 +3,13 @@
 
     $(document)
     .ajaxStart(function () {
-      $('#area-mapper-edit-form-wrapper')
-      .addClass('ajaxing');
-      clearForm();
+      $('body')
+      .addClass(Map.options.cssPrefix + 'ajaxing');
       setTitle('Please wait...');
     })
     .ajaxComplete(function () {
-      $('#area-mapper-edit-form-wrapper')
-      .removeClass('ajaxing');
+      $('body')
+      .removeClass(Map.options.cssPrefix + 'ajaxing');
     });
 
     function refreshFromServer() {
