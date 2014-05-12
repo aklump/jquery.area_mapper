@@ -90,7 +90,7 @@ AreaMapper.prototype = {
    */
   onSelectEnd: function (img, selection) {
     var Map = this;
-    Map.showSelectorControls();
+    Map.showControls();
 
     var data = {};
     if (typeof selection !== "undefined") {
@@ -269,14 +269,17 @@ AreaMapper.prototype = {
    * @return {this}
    */
   selectArea: function (id) {
-    var area = this.readArea(id);
-    if (area && area.id !== this.state.selected) {
+    var Map = this;
+    var area = Map.readArea(id);
+    if (area && area.id !== Map.state.selected) {
       var flag = 'selected';
-      this.removeFlagFromAll(flag);
-      this.addFlag(id, flag);
-      this.state.selected = id;
+      Map.removeFlagFromAll(flag);
+      Map.addFlag(id, flag);
+      Map.state.selected = id;
 
-      this.callbackInvoke('select', area);
+      Map.showControls();
+
+      Map.callbackInvoke('select', area);
     }
 
     return this;
@@ -380,10 +383,10 @@ AreaMapper.prototype = {
     }
 
     // if (Map.state.selectorOp === 'hidden') {
-    //   Map.hideSelectorControls();
+    //   Map.hideControls();
     // }
     // else {
-    //   Map.showSelectorControls();  
+    //   Map.showControls();  
     // }
 
     return this;
@@ -394,16 +397,16 @@ AreaMapper.prototype = {
    *
    * @return {this}
    */
-  showSelectorControls: function() {
+  showControls: function() {
     var Map = this;
 
-    if (Map.state.selectorOp === 'selecting') {
-      $(Map.options.controls.newSelectionAccept).show();
-      $(Map.options.controls.newSelectionCancel).show();
-    }
-    else if (Map.state.selectorOp === 'resizing') {
+    if (Map.state.selected) {
       $(Map.options.controls.resizeAccept).show();
       $(Map.options.controls.resizeCancel).show();
+    }
+    else {
+      $(Map.options.controls.newSelectionAccept).show();
+      $(Map.options.controls.newSelectionCancel).show();      
     }
 
     Map.refreshMap();
@@ -417,7 +420,7 @@ AreaMapper.prototype = {
    *
    * @return {self}
    */
-  hideSelectorControls: function() {
+  hideControls: function() {
     var Map = this;
     var list = 
     $(Map.options.controls.newSelectionAccept + ',' + Map.options.controls.newSelectionCancel + ',' + Map.options.controls.resizeAccept + ',' + Map.options.controls.resizeCancel).hide();
@@ -546,11 +549,17 @@ AreaMapper.prototype = {
 
     // Setup the selector controls
     $(Map.options.controls.newSelectionAccept).click(function () {
-      Map.createAreaFromSelection(0).hideSelectorControls();
+      Map
+      .createAreaFromSelection(0)
+      .hideControls();
+      
       return false;
     });
     $(Map.options.controls.newSelectionCancel).click(function () {
-      Map.selectorCancel().hideSelectorControls();
+      Map
+      .selectorCancel()
+      .hideControls();
+      
       return false;
     });    
     $(Map.options.controls.resizeAccept).click(function () {
@@ -558,7 +567,11 @@ AreaMapper.prototype = {
       return false;
     });
     $(Map.options.controls.resizeCancel).click(function () {
-      Map.selectorCancel().hideSelectorControls();
+      Map
+      .selectorCancel()
+      .deselectArea(Map.state.selected)
+      .hideControls();
+      
       return false;
     });  
 
