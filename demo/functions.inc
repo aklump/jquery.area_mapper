@@ -84,7 +84,7 @@ function render_form($node = array(), $id = NULL) {
     'title' => array('Title', 'textfield', "Displayed on the ad as the product title.<br><strong>Note</strong>: This title <em>is</em> public facing."),
     'field_product[und][0][target_id]' => array('Product', 'textfield', "Enter the product's name here."),
     'field_area_json' => array('', 'hidden', ''),
-    'field_description[und][0][value]' => array('Description', 'textfield',  'Displayed on the ad as the product title.<br><strong>Note</strong>: This title <em>is</em> public facing.'),
+    'field_description[und][0][value]' => array('Description', 'textfield',  '<strong>Example:</strong> Selected 1.75 qt. First 2, Please'),
     'field_price[und][0][value]' => array('Price', 'textfield', '<strong>Examples:</strong><br>
 $3.99/ea.<br>
 $2.99 when you buy 4<br>
