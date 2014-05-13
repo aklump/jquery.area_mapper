@@ -1,11 +1,13 @@
 (function($) {
   $('document').ready(function(){
 
+    var ajaxOp = 'Loading';
+
     $(document)
     .ajaxStart(function () {
       $('body')
       .addClass(Map.options.cssPrefix + 'ajaxing');
-      setTitle('Loading, please wait...');
+      setTitle(ajaxOp + '...');
     })
     .ajaxComplete(function () {
       $('body')
@@ -13,16 +15,15 @@
     });
 
     function refreshFromServer() {
+      ajaxOp = 'Loading';
       $.getJSON('server.php', function (response) {
         for (i in response.items) {
           var json = response.items[i].field_area_json;
           Map.createArea(response.items[i].nid, json);
         }
         Map.refreshMap();
+        refreshPage(response);
         defaultText();
-        setTitle(response.title);
-        setForm(response.form);
-        
       });
     }
 
@@ -37,54 +38,82 @@
     //     }
     //   });      
     // }
-    function serverCreate(formValues) {
+    function serverSave(op, formValues, data) {
+      defaultText();
+      ajaxOp = 'Saving';
+      var type = op === 'create' ? 'POST' : 'PUT';
+      var query = op === 'create' ? '' : '?id=' + data.id;
+      Map.addFlag(data.id, 'changed');
       $.ajax({
-        url: 'server.php',
-        type: 'POST',
+        url: 'server.php' + query,
+        type: type,
         data: formValues,
         dataType: 'json',
         success: function(response) {
-          if (response.items[0].nid) {
-            var newId = response.items[0].field_area_json.id;
-            var data = response.items[0].field_area_json;
+          refreshPage(response);
+          if (typeof response.items[0] !== 'undefined'
+            && response.items[0].nid) {
+            
+            // Juggle a bit and replace with NID.
             Map
-            .deleteArea(0)
-            .createArea(newId, data)
-            .refreshMap();
+            .unsetArea(data.id)
+            .createArea(response.items[0].field_area_json.id, response.items[0].field_area_json)
+            .removeFlag(response.items[0].field_area_json.id, 'changed');
+          }
+          // else {
+          //   // Map.addFlag(data.id, 'changed');
+          //   // Map.state.op = 'create';
+          //   // Map.state.selectorOp = 'selected';
+          //   // Map
+          //   // .showControls()
+          //   // .addFlag(data.id, 'changed')
+          //   // .selectArea(data.id);
+          //   // .activateSelectionFromArea(data.id);
 
-            setTitle(response.title);
-            setForm(response.form);            
-          };
+          // }
+          Map.refreshMap();
         }
       });      
     }
 
+
+
     function serverRead(id, json) {
+      ajaxOp = 'Loading';
       $.getJSON('server.php?id=' + id, function (response) {
         // It's possible that during the load the selected element has changed
         // if this is the case then we shouldn't fill in the form.
+        refreshPage(response);
         if (Map.state.selected === id) {
-          setTitle(response.title);
-          setForm(response.form);   
         }        
       });      
     }
 
     function serverDelete(id) {
+      ajaxOp = 'Deleting';
       $.ajax({
         url: 'server.php?id=' + id,
         type: 'DELETE',
         dataType: 'json',
         success: function(response) {
-          setTitle(response.title);
-          setForm(response.form);
-          defaultHelp();
+          refreshPage(response)
+          defaultText();
         }
       });
     }
 
     function getForm() {
       return $('#area-mapper-edit-form-wrapper form.am-form');
+    }
+
+    function refreshPage(response) {
+      setTitle(response.title);
+
+      $('.messages.error').html(response.messages.error);
+      $('.messages.warning').html(response.messages.warning);
+      $('.messages.status').html(response.messages.status);
+
+      setForm(response.form);
     }
 
     function setForm(form) {
@@ -104,8 +133,12 @@
       $('.am-help').html(help);
     }
 
+    function setMessage(message) {
+      $('.am-messages').html(message);
+    }
+
     function defaultText() {
-      setTitle('New Product Display');
+      setTitle('Editing Ad Page');
       var help = '';
       help += 'Click and drag to define the boundaries of a new product display.';
       if (Map.areas.length > 0) {
@@ -127,10 +160,15 @@
     // Attach a mapper object to our container
     var Map  = $('#area-mapper').areaMapper({
       "callbacks": {
-        "new": function(op, json, data) {
+        "onCreate": function(op, json, data) {
           setFormJson(json);
           var formValues = getForm().serialize();
-          serverCreate(formValues);
+          serverSave('create', formValues, data);
+        },
+        "onUpdate": function(op, json, data) {
+          setFormJson(json);
+          var formValues = getForm().serialize();
+          serverSave('update', formValues, data);
         },
         "onSelectStart": function(op, json, data) {
           if (Map.state.op === 'create') {
@@ -145,7 +183,7 @@
           defaultText();
         },
         "select": function(op, json, data) {
-          setHelp('Resize or move the area boundaries.  You may also edit the details in the form then click the Update button.');
+          setHelp('Resize or move the area boundaries or edit the details in the form, then click the Update button. You may also click the Delete button to delete this Product display.');
           serverRead(data.id, json);
         },
         // "deselect": function () {
@@ -163,6 +201,53 @@
     // $('#cancel').click(function () {
       // defaultHelp();
     // });
+    //
+    //
+    var query = queryObj(); 
+    var max = 6
+    var page = parseInt(query.page, 10) || 0;
+    var remains = max - page;
+
+    $('#done-button').click(function () {
+      alert('End of demo! :)');
+    });
+    if (remains >  0) {
+      var suffix = remains === 1 ? ' ad page remains' : ' ad pages remain';
+      $('.pager .index').html(remains + suffix);  
+      $('#done-button').hide();
+    }
+    
+    if (page > 0) {
+      $('#prev-page-button')
+      .css('visibility', 'visible')
+      .click(function () {      
+        window.location.search = 'page=' + (page - 1);
+      });        
+    }
+    else {
+      $('#prev-page-button').css('visibility', 'hidden');
+    }
+    if (page < max) {
+      $('#next-page-button')
+      .css('visibility', 'visible')
+      .click(function () {      
+        window.location.search = 'page=' + (page + 1);
+      });      
+    }
+    else {
+      $('#next-page-button').css('visibility', 'hidden');
+    }
+  
+    function queryObj() {
+      var result = {}, queryString = location.search.slice(1),
+          re = /([^&=]+)=([^&]*)/g, m;
+
+      while (m = re.exec(queryString)) {
+          result[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+      }
+
+      return result;
+    }    
 
 
   });

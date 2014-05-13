@@ -84,3 +84,25 @@ button {
   -o-border-radius: 20px;
   border-radius: 20px;
 }
+
+/* line 99, ../sass/theme.scss */
+.messages {
+  font-weight: bold;
+  font-size: 18px;
+  margin: 15px 0;
+}
+
+/* line 104, ../sass/theme.scss */
+.messages.status {
+  color: green;
+}
+
+/* line 107, ../sass/theme.scss */
+.messages.error {
+  color: red;
+}
+
+/* line 110, ../sass/theme.scss */
+.messages.warning {
+  color: #c9bb0c;
+}

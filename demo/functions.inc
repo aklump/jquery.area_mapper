@@ -52,10 +52,12 @@ function node_save($data, $nid = NULL) {
     $node->{$key} = $value;
   }
 
-  $node->field_area_json = json_decode($node->field_area_json);
-  $node->field_area_json->id = $nid;
-  unset($node->field_area_json->flags->selected);
-  unset($node->field_area_json->flags->changed);
+  if (isset($node->field_area_json)) {
+    $node->field_area_json = json_decode($node->field_area_json);
+    $node->field_area_json->id = $nid;
+    unset($node->field_area_json->flags->selected);
+    unset($node->field_area_json->flags->changed);
+  }
 
   $nodes[$nid] = $node;
   node_save_all($nodes);
@@ -85,15 +87,24 @@ function write_to_log($method, $args, $data) {
 
 function render_form($node = array(), $id = NULL) {
   $fields = array(
-    'title' => array('Title', 'textfield', "Displayed on the ad as the product title.<br><strong>Note</strong>: This title <em>is</em> public facing."),
-    'field_product[und][0][target_id]' => array('Product', 'textfield', "Enter the product's name here."),
-    'field_area_json' => array('', 'hidden', ''),
-    'field_description[und][0][value]' => array('Description', 'textfield',  '<strong>Example:</strong> Selected 1.75 qt. First 2, Please'),
-    'field_price[und][0][value]' => array('Price', 'textfield', '<strong>Examples:</strong><br>
+    'field_product[und][0][target_id]' => array(
+      'Product', 'textfield', "Enter the product's name here."
+    ),
+    'title' => array(
+      'Title', 'textfield', "Displayed on the ad as the product title.<br><strong>Note</strong>: This title <em>is</em> public facing."
+    ),
+    'field_description[und][0][value]' => array(
+      'Description', 'textfield',  '<strong>Example:</strong> Selected 1.75 qt. First 2, Please'
+    ),
+    'field_price[und][0][value]' => array(
+      'Price', 'textfield', '<strong>Examples:</strong><br>
 $3.99/ea.<br>
 $2.99 when you buy 4<br>
-$.79/lb.'),
-    
+$.79/lb.',
+    ),
+    'field_area_json' => array(
+      '', 'hidden', ''
+    ),
   );
   $output   = array();
   $output[] = '<form class="node-form node-product_display-form" action="/node/add/product-display" method="post" id="product-display-node-form" accept-charset="UTF-8">';

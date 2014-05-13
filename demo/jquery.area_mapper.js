@@ -150,9 +150,11 @@ AreaMapper.prototype = {
   saveAreaFromSelection: function (id) {
     var Map = this;
     var data = Map.readArea(id);
+    var callback = 'onUpdate';
     if (data === false) {
       Map.createArea(id, {});
       data = {};
+      callback = 'onCreate';
     };
 
     var coordinates = Map.selector.getSelection();
@@ -169,7 +171,7 @@ AreaMapper.prototype = {
     Map.selector.cancelSelection();
 
     var area = Map.readArea(id);
-    Map.callbackInvoke('new', area);
+    Map.callbackInvoke(callback, area);
 
     return this;
   },
@@ -301,6 +303,21 @@ AreaMapper.prototype = {
     }
 
     return this;
+  },
+
+  /**
+   * This is different from deleteArea in that it only unsets an area.
+   *
+   * @param  {int} id 
+   *
+   * @return {this}    
+   */
+  unsetArea: function(id) {
+    var Map = this;
+    Map.areas[id] = null;
+    Map.render.remove.push($('#' + Map.options.cssPrefix + id));
+
+    return this;    
   },
 
   /**
@@ -456,12 +473,13 @@ AreaMapper.prototype = {
 
     switch (Map.state.op) {
       case 'create':
+        $(Map.options.controls.updateTrigger + ',' + Map.options.controls.updateCancel + ',' + Map.options.controls.deleteTrigger + ',' + Map.options.controls.deleteCancel).hide();
         $(Map.options.controls.createTrigger + ',' + Map.options.controls.createCancel).show();
         break;
 
       case 'update':
-        $(Map.options.controls.updateTrigger + ',' + Map.options.controls.updateCancel).show();
-        $(Map.options.controls.deleteTrigger + ',' + Map.options.controls.deleteCancel).show();
+        $(Map.options.controls.createTrigger + ',' + Map.options.controls.createCancel).hide();
+        $(Map.options.controls.updateTrigger + ',' + Map.options.controls.updateCancel + ',' + Map.options.controls.deleteTrigger + ',' + Map.options.controls.deleteCancel).show();
         break;
 
       case 'delete':
@@ -720,7 +738,8 @@ $.fn.areaMapper.defaults = {
   },
   "callbacks": {
     "init": null,
-    "new": null,
+    "onCreate": null,
+    "onUpdate": null,
     "select": null,
     "delete": null,
     "onSelectStart": null,

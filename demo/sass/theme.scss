@@ -95,3 +95,18 @@ button {
 
 	@include border-radius(20px);
 }
+
+.messages {
+	font-weight: bold;
+	font-size: 18px;
+	margin: 15px 0;
+}
+.messages.status {
+	color: green;
+}
+.messages.error {
+	color: red;
+}
+.messages.warning {
+	color: #c9bb0c;
+}

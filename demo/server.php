@@ -17,62 +17,70 @@ $areas = array(
   (object) (array('id' => 'vc349', 'x' => 340) + $defaults),
 );
 
-$response = new stdClass;
+// Default response object.
+$response = array(
+  'title' => 'Editing Ad Page',
+  'form' => render_form(),
+  'items' => array(),
+  'messages' => (object) array(
+    'status' => '',
+    'warning' => '',
+    'error' => '',
+  ),
+);
 switch ($method) {
   case 'DELETE':
+    $node = node_load($id);
     node_delete($id);
-    $response = (object) array(
-      'title' => 'New Product Display',
-      'form' => render_form(),
-    );
+    $response['messages']->status = 'Product display <em>' . $node->title . '</em> deleted.';
     break;
 
   case 'POST':
     $request = $_POST;
-    $nid = node_save($request);
-    $response = (object) array(
-      'items' => array(node_load($nid)),
-      'title' => 'New Product Display',
-      'form' => render_form(),
-    );
+    if (empty($request['edit_title'])) {
+      header('Status: 406 Title is required.');
+      $response['messages']->error = "Title is a required field.";
+    }
+    else {
+      $nid = node_save($request);
+      $node = node_load($nid);
+      $response['items'] = array($node);
+      $response['messages']->status = 'Product display <em>' . $node->title . '</em> created.';    
+    }
     break;
 
   case 'PUT':
-    $request = $_POST;
-    node_save($request, $id);
-    $response = (object) array(
-      'items' => array(node_load($id)),
-      'title' => 'New Product Display',
-      'form' => render_form(),
-    );
+    parse_str(file_get_contents("php://input"), $request);
+    if (empty($request['edit_title'])) {
+      header('Status: 406 Title is required.');
+      $response['messages']->error = "Title is a required field.";
+    }
+    else {    
+      $message = 'updated';
+      if (!node_save($request, $id)) {
+        $id = node_save($request);
+        $message = 'created';
+      }
+      $node = node_load($id);
+      $response['items'] = array(node_load($id));
+      $response['messages']->status = 'Product display <em>' . $node->title . '</em> ' . $message . '.';
+    }
     break;
 
   case 'GET':
-    $response = (object) array(
+    $response = array(
       'items' => node_load_all(),
-      'title' => 'New Product Display',
-      'form' => render_form(),
-    );
-    if ($id) {
-      if (!($node = node_load($id))) {
-        $response->items = array();
-      }
-      else {
-        $response = new \stdClass;
-        $response->title = 'Edit ' . $node->title;
-        $response->items = array($node->nid => $node);
-        $response->form = render_form($node, $id);      
-      }
+    ) + $response;
+    if ($id && ($node = node_load($id))) {
+      $response['title'] = 'Edit ' . $node->title;
+      $response['items'] = array($node->nid => $node);
+      $response['form'] = render_form($node, $id);      
     }
-    break;
-  
-  default:
-    # code...
     break;
 }
 write_to_log($method, $_GET, $response);
 
-// sleep(1);
+sleep(1);
 
 header('Content Type: application/json');
 print json_encode($response);

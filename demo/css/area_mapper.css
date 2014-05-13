@@ -76,7 +76,7 @@ body.am-ajaxing .am-form {
 
 /* line 79, ../sass/area_mapper.scss */
 .am-changed {
-  background-color: #FDF001;
+  background-color: rgba(253, 240, 1, 0.45);
 }
 
 /* line 83, ../sass/area_mapper.scss */

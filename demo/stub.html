@@ -17,9 +17,19 @@
 <img id="area-mapper" src="images/yokes_salesad.jpg" alt="ad-map">
 
 <div id="node-edit-column">
-  <h1 class="am-title"></h1>
+  <div class="pager">
+    <button id="prev-page-button">Prev</button>
+    <button id="next-page-button">Next</button>
+    <button id="done-button">Done</button>
+    <span class="index"></span>
+  </div>
 
+  <h1 class="am-title"></h1>
   <div class="am-help"></div>
+
+  <div class="messages error"></div>
+  <div class="messages warning"></div>
+  <div class="messages status"></div>
 
   <div id="area-mapper-edit-form-wrapper">
     <form class="am-form" />
