@@ -9,3 +9,6 @@ demo/externs/jquery.imgareaselect/scripts/jquery.min.min.js
 demo/externs/jquery.imgareaselect/scripts/jquery.imgareaselect.pack.min.js
 demo/log.json
 demo/js/module.min.js
+demo/tests/qunit.min.js
+demo/js/simple.min.js
+config.codekit

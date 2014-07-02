@@ -7,7 +7,7 @@
  * Copyright 2013, Aaron Klump
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Fri May  9 17:12:03 PDT 2014
+ * Date: Wed Jul  2 15:20:40 PDT 2014
  */
 ;(function($, window, document, undefined) {
 "use strict";
@@ -470,7 +470,6 @@ AreaMapper.prototype = {
    */
   showControls: function() {
     var Map = this;
-
     switch (Map.state.op) {
       case 'create':
         $(Map.options.controls.updateTrigger + ',' + Map.options.controls.updateCancel + ',' + Map.options.controls.deleteTrigger + ',' + Map.options.controls.deleteCancel).hide();
