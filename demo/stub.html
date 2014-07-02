@@ -4,23 +4,45 @@
   <script src="externs/jquery-1.4.4.min.js"></script>
   <script src="externs/jquery.imgareaselect/scripts/jquery.imgareaselect.pack.js"></script>
   <script src="jquery.area_mapper.js"></script>
-  <script src="script.js"></script>
+  <script src="js/module.js"></script>
   <style type="text/css" media="all">
     @import url("externs/jquery.imgareaselect/css/imgareaselect-animated.css");
-    @import url("area_mapper.css");
+    @import url("css/area_mapper.css");
+    @import url("css/module.css");
+    @import url("css/theme.css");
   </style>
 </head>
 <body>
 
 <img id="area-mapper" src="images/yokes_salesad.jpg" alt="ad-map">
 
-<div id="area-mapper-edit-form-wrapper">
-  <h2>Edit Form</h2>
-  <div class="help"></div>
-  <form />
-</div>
+<div id="node-edit-column">
+  <div class="pager">
+    <button id="prev-page-button">Prev</button>
+    <button id="next-page-button">Next</button>
+    <button id="done-button">Done</button>
+    <span class="index"></span>
+  </div>
 
-<button id="convert">New</button>
+  <h1 class="am-title"></h1>
+  <div class="am-help"></div>
+
+  <div class="messages error"></div>
+  <div class="messages warning"></div>
+  <div class="messages status"></div>
+
+  <div id="area-mapper-edit-form-wrapper">
+    <form class="am-form" />
+  </div>
+
+  <div id="area-mapper-controls">
+    <button id="am-create">Save</button>
+    <button id="am-update">Update</button>
+    <button id="am-delete">Delete</button>
+    <button id="am-cancel">Cancel</button>  
+  </div>
+
+</div>
 
 <!-- <form action="" id="areaEditForm">
   <div><label>Json: <textarea id="areaJson" name="areaJson" rows="2" cols="50"></textarea></label></div>

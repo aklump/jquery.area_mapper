@@ -4,43 +4,8 @@
  * A mock server backend
  *
  */
+require_once dirname(__FILE__) . '/functions.inc';
 
-// if (!function_exists('write_to_log')) {
-  function write_to_log($method, $args, $data) {
-    $line = (object) array(
-      'method' => $method, 
-      'args' => $args, 
-      'response' => $data, 
-    );
-    $file = 'log.json';
-    if (!($json = json_decode(file_get_contents($file)))) {
-      $json = array();
-    }
-    $json[] = $line;
-    file_put_contents($file, json_encode($json));
-  }
-// }
-
-function render_form($data = array()) {
-  if (empty($data)) {
-    $data = array(
-      'product' => '',
-      'price' => '',
-      'title' => '',
-    );
-  }
-  $output   = array();
-  $output[] = '<form>';
-  foreach ($data as $key => $value) {
-    $output[] = "<div class=\"form-item\"><label>$key <input type=\"text\" value=\"$value\" name=\"$key\" id=\"$key\"/></label></div>";
-  }
-
-  $output[] = '<input type="button" value="Delete" name="delete" id="delete" />';
-  $output[] = '<input type="button" value="Update" name="update" id="update" />';
-  $output[] = '</form>';
-  
-  return implode(PHP_EOL, $output);
-}
 
 $method = strtoupper($_SERVER['REQUEST_METHOD']);
 $id     = isset($_GET['id']) ? $_GET['id'] : NULL;
@@ -52,45 +17,65 @@ $areas = array(
   (object) (array('id' => 'vc349', 'x' => 340) + $defaults),
 );
 
-$form_data = array(
-  'as1199' => (object) array(
-    'product' => 'WASSF',
-    'price' => '$11.99/lb',
-    'title' => 'Wild, Alaskan Sockeye Salmon Fillets',
-  ),
-  'pr599' => (object) array(
-    'product' => 'FPRF',
-    'price' => '$5.99/lb',
-    'title' => 'Fresh Pacific Rockfish Fillets',
-  ),
-  'vc349' => (object) array(
-    'product' => 'FVC',
-    'price' => '$3.49/lb',
-    'title' => 'Fresh Venus Clams',
+// Default response object.
+$response = array(
+  'title' => 'Editing Ad Page',
+  'form' => render_form(),
+  'items' => array(),
+  'messages' => (object) array(
+    'status' => '',
+    'warning' => '',
+    'error' => '',
   ),
 );
-
-$response = new stdClass;
 switch ($method) {
-  case 'GET':
-    $response = (object) array(
-      'items' => $areas,
-      'form' => render_form(),
-    );
-    if ($id) {
-      $response = array();
-      foreach ($areas as $area) {
-        if ($area->id == $id) {
-          $area->form = render_form($form_data[$id]);
-          $response = $area;
-          break;
-        }
-      }
+  case 'DELETE':
+    $node = node_load($id);
+    node_delete($id);
+    $response['messages']->status = 'Product display <em>' . $node->title . '</em> deleted.';
+    break;
+
+  case 'POST':
+    $request = $_POST;
+    if (empty($request['edit_title'])) {
+      header('Status: 406 Title is required.');
+      $response['messages']->error = "Title is a required field.";
+    }
+    else {
+      $nid = node_save($request);
+      $node = node_load($nid);
+      $response['items'] = array($node);
+      $response['messages']->status = 'Product display <em>' . $node->title . '</em> created.';    
     }
     break;
-  
-  default:
-    # code...
+
+  case 'PUT':
+    parse_str(file_get_contents("php://input"), $request);
+    if (empty($request['edit_title'])) {
+      header('Status: 406 Title is required.');
+      $response['messages']->error = "Title is a required field.";
+    }
+    else {    
+      $message = 'updated';
+      if (!node_save($request, $id)) {
+        $id = node_save($request);
+        $message = 'created';
+      }
+      $node = node_load($id);
+      $response['items'] = array(node_load($id));
+      $response['messages']->status = 'Product display <em>' . $node->title . '</em> ' . $message . '.';
+    }
+    break;
+
+  case 'GET':
+    $response = array(
+      'items' => node_load_all(),
+    ) + $response;
+    if ($id && ($node = node_load($id))) {
+      $response['title'] = 'Edit ' . $node->title;
+      $response['items'] = array($node->nid => $node);
+      $response['form'] = render_form($node, $id);      
+    }
     break;
 }
 write_to_log($method, $_GET, $response);

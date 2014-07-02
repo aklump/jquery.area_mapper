@@ -76,5 +76,5 @@ else {
 from_demo_copy($path_to_root, array(
   'jquery.area_mapper.js',
   'jquery.area_mapper.min.js',
-  'area_mapper.css',
+  'css/area_mapper.css',
 ));
