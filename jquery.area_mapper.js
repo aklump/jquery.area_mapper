@@ -1,5 +1,5 @@
 /**
- * Area Mapper jQuery JavaScript Plugin v0.0.2
+ * Area Mapper jQuery JavaScript Plugin v0.0.3
  * 
  *
  * jQuery plugin providing a CRUD UI for defining areas over an image.
@@ -7,7 +7,7 @@
  * Copyright 2013, Aaron Klump
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Wed Jul  2 15:34:55 PDT 2014
+ * Date: Thu Jul  3 03:08:37 PDT 2014
  */
 ;(function($, window, document, undefined) {
 "use strict";
@@ -59,6 +59,7 @@ function AreaMapper(element, options) {
   this.options = $.extend({}, $.fn.areaMapper.defaults, options);  
 
   this.init();
+  this.initControls();
 }
 
 AreaMapper.prototype = {
@@ -635,8 +636,18 @@ AreaMapper.prototype = {
 
     Map.selector = $(Map.element).imgAreaSelect(options);
 
-    //
-    //
+    Map
+    .refreshMap()
+    .callbackInvoke('init');
+  },
+
+  /**
+   * Initialize the controls.
+   */
+  initControls: function() {
+    var Map = this;
+    var prefix = this.options.cssPrefix;
+
     //
     // Set up all the control, click-handlers.
     // 
@@ -713,12 +724,8 @@ AreaMapper.prototype = {
       .selectorCancel();
       
       return false;
-    });
-
-    Map
-    .refreshMap()
-    .callbackInvoke('init');
-  },
+    });    
+  }
 };
 
 $.fn.areaMapper = function(options) {
