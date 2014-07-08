@@ -1,4 +1,4 @@
 name = "Area Mapper"
 description = "jQuery plugin providing a CRUD UI for defining areas over an image."
-version = 0.0.3
+version = 0.0.4
 author = Aaron Klump <sourcecode@intheloftstudios.com>
