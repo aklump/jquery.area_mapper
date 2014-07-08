@@ -1,5 +1,5 @@
 /**
- * Area Mapper jQuery JavaScript Plugin v0.0.3
+ * Area Mapper jQuery JavaScript Plugin v0.0.4
  * 
  *
  * jQuery plugin providing a CRUD UI for defining areas over an image.
@@ -7,7 +7,7 @@
  * Copyright 2013, Aaron Klump
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * Date: Thu Jul  3 03:08:37 PDT 2014
+ * Date: Mon Jul  7 21:31:53 PDT 2014
  */
 ;(function($, window, document, undefined) {
 "use strict";
