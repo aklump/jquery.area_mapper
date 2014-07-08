@@ -35,9 +35,9 @@ test('saveAreaFromSelection', function () {
   .appendTo($('body'))
   .addClass('qunit-test');  
 
-  var newTest = false;
-  var options = {"callbacks": {"new": function (op, json, data) {
-    newTest = op === 'new' && typeof json === 'string' && typeof data === 'object';
+  var onCreateTest = false;
+  var options = {"callbacks": {"onCreate": function (op, json, data) {
+    onCreateTest = op === 'onCreate' && typeof json === 'string' && typeof data === 'object';
   }}};
   var Map  = $target.areaMapper(options);
 
@@ -60,7 +60,7 @@ test('saveAreaFromSelection', function () {
   // }};
   propEqual(Map.readArea('do'), control, "Do area was created with correct params.")
 
-  strictEqual(newTest, true, "new callback was called correctly.");
+  strictEqual(onCreateTest, true, "'onCreate' callback was called correctly.");
 
 });
 
