@@ -71,10 +71,3 @@ if (file_put_contents($source_file, $source)) {
 else {
   echo "Error updating $source_file";
 }
-
-// Copy over the demo files.
-from_demo_copy($path_to_root, array(
-  'jquery.area_mapper.js',
-  'jquery.area_mapper.min.js',
-  'css/area_mapper.css',
-));
