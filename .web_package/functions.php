@@ -23,6 +23,10 @@ function js_replace_homepage(&$text, $homepage) {
   $text = " * $homepage";
 }
 
+function js_replace_version_function(&$source, $new_version) {
+  $source = preg_replace('/(\$\.fn.+version.+\')([\d-.]*)\'/', '${1}' . $new_version . "'", $source);
+}
+
 /**
  * Copy files from root into demo.
  *
