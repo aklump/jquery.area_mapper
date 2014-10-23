@@ -64,6 +64,9 @@ $find     = implode(PHP_EOL, $comment_lines);
 $replace  = implode(PHP_EOL, $comment_lines_replace);
 $source   = str_replace($find, $replace, $source);
 
+// Replace the version function.
+js_replace_version_function($source, $new_version);
+
 // Save the new version of the file
 if (file_put_contents($source_file, $source)) {
   echo "$source_file has been updated.";
